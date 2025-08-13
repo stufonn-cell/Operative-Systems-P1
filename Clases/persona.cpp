@@ -87,26 +87,51 @@ int Persona::calcularEdad() const {
     Fecha nacimiento(fechaNacimiento);
     Fecha actual = Fecha::hoy();
     int edad = actual.getAnio() - nacimiento.getAnio();
+
     if (actual.getMes() < nacimiento.getMes() ||
         (actual.getMes() == nacimiento.getMes() && actual.getDia() < nacimiento.getDia())) {
         edad--;
     }
+
     return edad;
 }
 
-std::map<std::string, std::vector<Persona>> Persona::agruparPorCiudad(std::vector<Persona> &personas){
+std::map<std::string, std::vector<Persona>> Persona::agruparPorCiudadValor(std::vector<Persona> &personas){
     std::map<std::string, std::vector<Persona>> grupos;
 
     for(const auto &persona : personas){
         std::string ciudadNacimiento = persona.getCiudadNacimiento();
 
-    grupos[persona.getCiudadNacimiento()].push_back(persona);
+        grupos[persona.getCiudadNacimiento()].push_back(persona);
     }
 
     return grupos;
 }
 
-std::map<std::string, std::vector<Persona>> Persona::agruparPorDeclaracion(std::vector<Persona> &personas) {
+void Persona::agruparPorCiudad(std::vector<Persona> &personas,
+                               std::map<std::string, std::vector<Persona>> &grupos) {
+
+    for(const auto &persona : personas){
+        std::string ciudadNacimiento = persona.getCiudadNacimiento();
+
+        grupos[persona.getCiudadNacimiento()].push_back(persona);
+    }
+}
+
+void Persona::agruparPorDeclaracion(std::vector<Persona> &personas,
+                                    std::map<std::string, std::vector<Persona>> &grupos) {
+    for(const auto &persona : personas){
+        std::string documento = persona.getId();
+        std::string ultimosDigitos = documento.substr( (documento.size() - 2) );
+        int digitosNumericos = std::stoi(ultimosDigitos);
+
+        if (digitosNumericos <= 39) grupos["<39"].push_back(persona);
+        else if (digitosNumericos <= 79) grupos["<79"].push_back(persona);
+        else if (digitosNumericos <= 99) grupos["<99"].push_back(persona);
+    }
+}
+
+std::map<std::string, std::vector<Persona>> Persona::agruparPorDeclaracionValor(std::vector<Persona> &personas) {
     std::map<std::string, std::vector<Persona>> grupos;
 
     for(const auto &persona : personas){
