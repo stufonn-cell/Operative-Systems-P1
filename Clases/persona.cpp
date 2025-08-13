@@ -192,11 +192,11 @@ int Persona::ultimosDosDigitosCC(const std::string& id) {
             }
         }
     }
-
-    if (digito1 = -1) return -1;
-    if (digito2 = -1) return digito1;
+    if (digito1 == -1) return -1;
+    if (digito2 == -1) return digito1;
     return digito2 * 10 + digito1;
 }
+
 
 std::string Persona::grupoDIANusandoDigitos(int dd){
     if (dd < 0) return "Desconocido";
@@ -212,27 +212,150 @@ std::string Persona::grupoDIAN2025(const Persona& persona) {
     return grupoDIANusandoDigitos(digitos);
 }
 
-int main() {
-    std::vector<Persona> personas = generarColeccion(1000000);
+std::map<std::string, std::vector<const Persona*>>
+Persona::agruparDeclarantesPorCalendarioPtr(const std::vector<Persona>& personas,
+                                            std::map<std::string, int>* contador) {
+    std::map<std::string, std::vector<const Persona*>> grupos;
 
-    //Persona p("Juan", "Pérez", "123", "Bogotá", "1998-05-20", 50000, 200000, 10000, true);
 
-    // std::string nombreMasLongevo = Persona::personaMaxLongeva(personas);
+    grupos["Grupo A"];
+    grupos["Grupo B"];
+    grupos["Grupo C"];
 
-    // std::cout << nombreMasLongevo << std::endl;
+    if (contador) {
+        contador->clear();
+        (*contador)["Grupo A"] = 0;
+        (*contador)["Grupo B"] = 0;
+        (*contador)["Grupo C"] = 0;
+    }
 
-    // auto agrupao = Persona::agruparPorCiudad(personas);
+    for (const auto& persona : personas) {
+        if (!persona.getDeclaranteRenta()) continue;
 
-    // for (auto x : agrupao) {
-    //     std::cout << x.first << " " << x.second.size() << std::endl;
-    //     std::string longevo = Persona::personaMaxLongevaValor(x.second);
-    //     std::cout << "Persona más longeva en " << x.first << ": " << longevo << std::endl;
-    // }
+        std::string grupo = grupoDIAN2025(persona);
+        if (grupo == "Grupo A" || grupo == "Grupo B" || grupo == "Grupo C") {
+            grupos[grupo].push_back(&persona);
+            if (contador) ++(*contador)[grupo];
+        }
+    }
+    return grupos;
+}
 
-    auto grupoDeclaracion = Persona::agruparPorDeclaracion(personas);
+Persona::CalendarioAgrupadito
+Persona::agruparDeclarantesPorCalendarioValor(std::vector<Persona> personas)
+{
+    CalendarioAgrupadito resultado;
 
-    for (auto grupo : grupoDeclaracion) {
-        std::cout << grupo.first << " " << grupo.second.size() << std::endl;
+
+    resultado.grupos["Grupo A"] = std::vector<Persona>();
+    resultado.grupos["Grupo B"] = std::vector<Persona>();
+    resultado.grupos["Grupo C"] = std::vector<Persona>();
+
+    resultado.conteo["Grupo A"] = 0;
+    resultado.conteo["Grupo B"] = 0;
+    resultado.conteo["Grupo C"] = 0;
+
+
+    for (auto personaActual : personas)
+    {
+        if (!personaActual.getDeclaranteRenta())
+        {
+            continue;
+        }
+
+
+        std::string documento = personaActual.getId();
+
+        int ultimo = -1;
+        int penultimo = -1;
+
+        for (int i = static_cast<int>(documento.size()) - 1; i >= 0; --i)
+        {
+            char ch = documento[i];
+
+            if (ch >= '0' && ch <= '9')
+            {
+                if (ultimo == -1)
+                {
+                    ultimo = ch - '0';
+                }
+                else
+                {
+                    penultimo = ch - '0';
+                    break;
+                }
+            }
+        }
+
+        int dosDigitos;
+
+        if (ultimo == -1)
+        {
+            dosDigitos = -1;
+        }
+        else if (penultimo == -1)
+        {
+            dosDigitos = ultimo;
+        }
+        else
+        {
+            dosDigitos = penultimo * 10 + ultimo;
+        }
+
+        // asigación de grupitos
+        std::string grupo;
+
+        if (dosDigitos >= 0 && dosDigitos <= 39)
+        {
+            grupo = "Grupo A";
+        }
+        else if (dosDigitos >= 40 && dosDigitos <= 79)
+        {
+            grupo = "Grupo B";
+        }
+        else if (dosDigitos >= 80 && dosDigitos <= 99)
+        {
+            grupo = "Grupo C";
+        }
+        else
+        {
+            grupo = "Desconocido";
+        }
+
+        // Solo guardamos A/B/C
+        if (grupo == "Grupo A" || grupo == "Grupo B" || grupo == "Grupo C")
+        {
+            resultado.grupos[grupo].push_back(personaActual);
+            resultado.conteo[grupo] = resultado.conteo[grupo] + 1;
+        }
+    }
+
+    return resultado;
+}
+
+bool Persona::validarAsignacionCalendario(const Persona& persona, const std::string& grupoEsperado) {
+    if (!persona.getDeclaranteRenta()) return false;
+    std::string grupo = grupoDIAN2025(persona);
+    return grupo == grupoEsperado;
+}
+int main()
+{
+
+    std::vector<Persona> personas = generarColeccion(10);
+
+
+    Persona::CalendarioAgrupadito resultado =
+        Persona::agruparDeclarantesPorCalendarioValor(personas);
+
+
+    std::cout << "Conteo por calendario (VALOR):\n";
+
+    for (auto par : resultado.conteo)
+    {
+        std::string nombreGrupo = par.first;
+        int cantidad = par.second;
+
+        std::cout << "  " << nombreGrupo << ": " << cantidad << "\n";
     }
 
     return 0;
