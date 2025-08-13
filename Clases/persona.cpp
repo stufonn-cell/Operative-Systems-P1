@@ -1,11 +1,12 @@
-#include "persona.h"
 #include <iostream>
 #include <iomanip>  // Para formato de salida (setprecision, fixed)
 #include <ctime> // Para obtener la fecha actual
-#include "generador.h"
 #include <map>
 #include <cctype>
 #include <stdexcept>
+#include <algorithm>
+#include "persona.h"
+#include "generador.h"
 
 // Implementación del constructor
 Persona::Persona(std::string nom, std::string ape, std::string id,
@@ -93,25 +94,6 @@ int Persona::calcularEdad() const {
     return edad;
 }
 
-
-// ***************************** (1) Persona Mas Longeva *************************************
-std::string Persona::personaMaxLongeva(std::vector<Persona> &personas){
-    if(personas.empty()){
-        throw std::runtime_error("La lista está vacía");
-    }
-
-    Persona* masLongevo = &personas[0];
-
-    for(auto &persona : personas){
-        if (persona.calcularEdad() > masLongevo->calcularEdad()){
-            masLongevo = &persona;
-        }
-    }
-
-    return masLongevo->getNombre();
-}
-
-
 std::map<std::string, std::vector<Persona>> Persona::agruparPorCiudad(std::vector<Persona> &personas){
     std::map<std::string, std::vector<Persona>> grupos;
 
@@ -124,25 +106,78 @@ std::map<std::string, std::vector<Persona>> Persona::agruparPorCiudad(std::vecto
     return grupos;
 }
 
+std::map<std::string, std::vector<Persona>> Persona::agruparPorDeclaracion(std::vector<Persona> &personas) {
+    std::map<std::string, std::vector<Persona>> grupos;
 
-std::string Persona::personaMaxLongevaValor(std::vector<Persona> personas){
+    for(const auto &persona : personas){
+        std::string documento = persona.getId();
+        std::string ultimosDigitos = documento.substr( (documento.size() - 2) );
+        int digitosNumericos = std::stoi(ultimosDigitos);
+
+        if (digitosNumericos <= 39) grupos["<39"].push_back(persona);
+        else if (digitosNumericos <= 79) grupos["<79"].push_back(persona);
+        else if (digitosNumericos <= 99) grupos["<99"].push_back(persona);
+    }
+
+    return grupos;
+}
+
+
+// ***************************** (1) Persona Mas Longeva *************************************
+void Persona::personaMaxLongeva(std::vector<Persona> &personas, Persona &longeva){
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
 
-    Persona masLongevo = personas[0];
-
-    for(const Persona persona : personas){
-        if (persona.calcularEdad() > masLongevo.calcularEdad()){
-            masLongevo = persona;
-        }
-    }
-
-    return masLongevo.getNombre();
+    longeva = *std::max_element(personas.begin(), personas.end(),
+                [](const Persona &a, const Persona &b)
+                {
+                    return a.calcularEdad() < b.calcularEdad();
+                });
 }
 
-// ***************************** (3) Persona Mas Longeva *************************************
-int Persona::ultimosDosDigitosCC(const std::string& id){
+Persona Persona::personaMaxLongevaValor(std::vector<Persona> personas){
+    if(personas.empty()){
+        throw std::runtime_error("La lista está vacía");
+    }
+
+    return *std::max_element(personas.begin(), personas.end(),
+                [](const Persona &a, const Persona &b)
+                {
+                    return a.calcularEdad() < b.calcularEdad();
+                });
+}
+
+
+// ***************************** (2) Persona con Mayor Patrimonio *************************************
+
+void Persona::personaMaxPatrimonio(std::vector<Persona> &personas, Persona &maxPatrimonio) {
+    if(personas.empty()){
+        throw std::runtime_error("La lista está vacía");
+    }
+
+    maxPatrimonio = *std::max_element(personas.begin(), personas.end(),
+                    [](const Persona &a, const Persona &b)
+                    {
+                        return a.getPatrimonio() < b.getPatrimonio();
+                    });
+}
+
+Persona Persona::personaMaxPatrimonioValor(std::vector<Persona> &personas) {
+    if(personas.empty()){
+        throw std::runtime_error("La lista está vacía");
+    }
+
+    return *std::max_element(personas.begin(), personas.end(),
+            [](const Persona &a, const Persona &b)
+            {
+                return a.getPatrimonio() < b.getPatrimonio();
+            });
+}
+
+
+// ***************************** (3) Declarantes de renta *************************************
+int Persona::ultimosDosDigitosCC(const std::string& id) {
     int digito1= -1;
     int digito2= -1;
 
@@ -156,14 +191,15 @@ int Persona::ultimosDosDigitosCC(const std::string& id){
                 break;
             }
         }
-        if (digito1 = -1) return -1;
-        if (digito2 = -1) return digito1;
-        return digito2 * 10 + digito1;
     }
+
+    if (digito1 = -1) return -1;
+    if (digito2 = -1) return digito1;
+    return digito2 * 10 + digito1;
 }
 
 std::string Persona::grupoDIANusandoDigitos(int dd){
-    if (dd < 0) return "Desconodido";
+    if (dd < 0) return "Desconocido";
     if (dd <= 39) return "Grupo A";
     if (dd <= 79) return "Grupo B";
     if (dd <= 99) return "Grupo C";
@@ -172,26 +208,32 @@ std::string Persona::grupoDIANusandoDigitos(int dd){
 
 std::string Persona::grupoDIAN2025(const Persona& persona) {
     int digitos = ultimosDosDigitosCC(persona.getId());
+    std::cout << digitos << std::endl;
     return grupoDIANusandoDigitos(digitos);
 }
-int main() {
 
+int main() {
     std::vector<Persona> personas = generarColeccion(1000000);
 
     //Persona p("Juan", "Pérez", "123", "Bogotá", "1998-05-20", 50000, 200000, 10000, true);
 
-    std::string nombreMasLongevo = Persona::personaMaxLongeva(personas);
+    // std::string nombreMasLongevo = Persona::personaMaxLongeva(personas);
 
-    std::cout << nombreMasLongevo << std::endl;
+    // std::cout << nombreMasLongevo << std::endl;
 
-    auto agrupao = Persona::agruparPorCiudad(personas);
+    // auto agrupao = Persona::agruparPorCiudad(personas);
 
-    for (auto x : agrupao) {
-        std::cout << x.first << " " << x.second.size() << std::endl;
-        std::string longevo = Persona::personaMaxLongevaValor(x.second);
-        std::cout << "Persona más longeva en " << x.first << ": " << longevo << std::endl;
+    // for (auto x : agrupao) {
+    //     std::cout << x.first << " " << x.second.size() << std::endl;
+    //     std::string longevo = Persona::personaMaxLongevaValor(x.second);
+    //     std::cout << "Persona más longeva en " << x.first << ": " << longevo << std::endl;
+    // }
+
+    auto grupoDeclaracion = Persona::agruparPorDeclaracion(personas);
+
+    for (auto grupo : grupoDeclaracion) {
+        std::cout << grupo.first << " " << grupo.second.size() << std::endl;
     }
-
 
     return 0;
 }

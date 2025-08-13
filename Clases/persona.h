@@ -44,9 +44,12 @@ public:
     void mostrar() const;         // Muestra todos los detalles completos
     void mostrarResumen() const;  // Muestra versión compacta para listados
     int calcularEdad() const; // Calcula la edad a partir de la fecha de nacimiento
-    static std::string personaMaxLongeva(std::vector<Persona> &personas);
-    static std::string personaMaxLongevaValor(std::vector<Persona> personas);
     static std::map<std::string, std::vector<Persona>> agruparPorCiudad(std::vector<Persona> &personas);
+    static std::map<std::string, std::vector<Persona>> agruparPorDeclaracion(std::vector<Persona> &personas);
+    static void personaMaxLongeva(std::vector<Persona> &personas, Persona &longeva);
+    static Persona personaMaxLongevaValor(std::vector<Persona> personas);
+    static void personaMaxPatrimonio(std::vector<Persona> &personas, Persona &maxPatrimonio);
+    static Persona personaMaxPatrimonioValor(std::vector<Persona> &personas);
     static std::string grupoDIAN2025(const Persona& persona);
     static std::map<std::string, std::vector<Persona>>
     agruparDeclarantesPorCalendarioVal(const std::vector<Persona>& personas);
