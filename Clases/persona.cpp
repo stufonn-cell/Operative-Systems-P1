@@ -156,14 +156,15 @@ int Persona::ultimosDosDigitosCC(const std::string& id){
                 break;
             }
         }
-        if (digito1 = -1) return -1;
-        if (digito2 = -1) return digito1;
-        return digito2 * 10 + digito1;
     }
+    if (digito1 == -1) return -1;
+    if (digito2 == -1) return digito1;
+    return digito2 * 10 + digito1;
 }
 
+
 std::string Persona::grupoDIANusandoDigitos(int dd){
-    if (dd < 0) return "Desconodido";
+    if (dd < 0) return "Desconocido";
     if (dd <= 39) return "Grupo A";
     if (dd <= 79) return "Grupo B";
     if (dd <= 99) return "Grupo C";
@@ -174,24 +175,83 @@ std::string Persona::grupoDIAN2025(const Persona& persona) {
     int digitos = ultimosDosDigitosCC(persona.getId());
     return grupoDIANusandoDigitos(digitos);
 }
-int main() {
 
-    std::vector<Persona> personas = generarColeccion(1000000);
+std::map<std::string, std::vector<const Persona*>>
+Persona::agruparDeclarantesPorCalendarioPtr(const std::vector<Persona>& personas,
+                                            std::map<std::string, int>* contador) {
+    std::map<std::string, std::vector<const Persona*>> grupos;
 
-    //Persona p("Juan", "Pérez", "123", "Bogotá", "1998-05-20", 50000, 200000, 10000, true);
 
-    std::string nombreMasLongevo = Persona::personaMaxLongeva(personas);
+    grupos["Grupo A"];
+    grupos["Grupo B"];
+    grupos["Grupo C"];
 
-    std::cout << nombreMasLongevo << std::endl;
-
-    auto agrupao = Persona::agruparPorCiudad(personas);
-
-    for (auto x : agrupao) {
-        std::cout << x.first << " " << x.second.size() << std::endl;
-        std::string longevo = Persona::personaMaxLongevaValor(x.second);
-        std::cout << "Persona más longeva en " << x.first << ": " << longevo << std::endl;
+    if (contador) {
+        contador->clear();
+        (*contador)["Grupo A"] = 0;
+        (*contador)["Grupo B"] = 0;
+        (*contador)["Grupo C"] = 0;
     }
 
+    for (const auto& persona : personas) {
+        if (!persona.getDeclaranteRenta()) continue;
+
+        std::string grupo = grupoDIAN2025(persona);
+        if (grupo == "Grupo A" || grupo == "Grupo B" || grupo == "Grupo C") {
+            grupos[grupo].push_back(&persona);
+            if (contador) ++(*contador)[grupo];
+        }
+    }
+    return grupos;
+}
+
+
+bool Persona::validarAsignacionCalendario(const Persona& persona, const std::string& grupoEsperado) {
+    if (!persona.getDeclaranteRenta()) return false;
+    std::string grupo = grupoDIAN2025(persona);
+    return grupo == grupoEsperado;
+}
+int main() {
+
+    std::vector<Persona> personas = generarColeccion(1000);
+
+    // 2) Conteo por calendario usando la versión Ptr
+    std::map<std::string,int> conteo;
+    auto gruposPtr = Persona::agruparDeclarantesPorCalendarioPtr(personas, &conteo);
+
+    std::cout << "Declarantes por calendario (Ptr):\n";
+    std::cout << "Grupo A: " << conteo["Grupo A"] << "\n";
+    std::cout << "Grupo B: " << conteo["Grupo B"] << "\n";
+    std::cout << "Grupo C: " << conteo["Grupo C"] << "\n\n";
+
+    // 3) Validar asignación (primeros 5 declarantes que encuentre)
+    std::cout << "Validaciones (primeros 5 declarantes):\n";
+    int mostrados = 0;
+    for (const auto& p : personas) {
+        if (!p.getDeclaranteRenta()) continue;
+        std::string g = Persona::grupoDIAN2025(p);
+        bool ok = Persona::validarAsignacionCalendario(p, g); // debe dar true
+        std::cout << " - " << p.getNombre() << " (" << p.getId()
+                  << ") -> " << g << " : " << (ok ? "OK" : "INCORRECTO") << "\n";
+        if (++mostrados == 5) break;
+    }
+    std::cout << "\n";
+
+    // 4) Listar algunos por grupo desde la versión Ptr (sin copias)
+    for (std::string key : {"Grupo A", "Grupo B", "Grupo C"}) {
+        std::cout << "Primeros 3 de " << key << ":\n";
+        const auto& vec = gruposPtr[key];
+        for (size_t i = 0; i < vec.size() && i < 3; ++i) {
+            const Persona* pp = vec[i];
+            std::cout << "   • " << pp->getNombre() << " " << pp->getApellido()
+                      << " (" << pp->getId() << ")\n";
+        }
+        std::cout << "\n";
+    }
+
+    // 5) (Ya lo tienes) persona más longeva en todo el dataset
+    std::cout << "Más longevo en todo el país: "
+              << Persona::personaMaxLongeva(personas) << "\n";
 
     return 0;
 }
