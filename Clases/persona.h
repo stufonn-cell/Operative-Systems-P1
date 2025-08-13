@@ -23,6 +23,12 @@ private:
     static int ultimosDosDigitosCC(const std::string& id);
     static std::string grupoDIANusandoDigitos(int dd);
 public:
+
+    class CalendarioAgrupadito {
+        public:
+            std::map<std::string, std::vector<Persona>> grupos;
+            std::map<std::string, int> conteo;
+        };
     // Constructor: Inicializa todos los campos de la persona
     Persona(std::string nom, std::string ape, std::string id,
             std::string ciudad, std::string fecha, double ingresos,
@@ -54,6 +60,8 @@ public:
     static std::map<std::string, int>
     contarDeclarantesPorCalendario(const std::vector<Persona>& personas);
     static bool validarAsignacionCalendario(const Persona& p, const std::string& grupoEsperado);
+    static CalendarioAgrupadito
+    agruparDeclarantesPorCalendarioValor(std::vector<Persona> personas);
 };
 
 #endif // PERSONA_H
