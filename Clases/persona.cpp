@@ -205,53 +205,122 @@ Persona::agruparDeclarantesPorCalendarioPtr(const std::vector<Persona>& personas
     return grupos;
 }
 
+Persona::CalendarioAgrupadito
+Persona::agruparDeclarantesPorCalendarioValor(std::vector<Persona> personas)
+{
+    CalendarioAgrupadito resultado;
+
+
+    resultado.grupos["Grupo A"] = std::vector<Persona>();
+    resultado.grupos["Grupo B"] = std::vector<Persona>();
+    resultado.grupos["Grupo C"] = std::vector<Persona>();
+
+    resultado.conteo["Grupo A"] = 0;
+    resultado.conteo["Grupo B"] = 0;
+    resultado.conteo["Grupo C"] = 0;
+
+
+    for (auto personaActual : personas)
+    {
+        if (!personaActual.getDeclaranteRenta())
+        {
+            continue;
+        }
+
+
+        std::string documento = personaActual.getId();
+
+        int ultimo = -1;
+        int penultimo = -1;
+
+        for (int i = static_cast<int>(documento.size()) - 1; i >= 0; --i)
+        {
+            char ch = documento[i];
+
+            if (ch >= '0' && ch <= '9')
+            {
+                if (ultimo == -1)
+                {
+                    ultimo = ch - '0';
+                }
+                else
+                {
+                    penultimo = ch - '0';
+                    break;
+                }
+            }
+        }
+
+        int dosDigitos;
+
+        if (ultimo == -1)
+        {
+            dosDigitos = -1;
+        }
+        else if (penultimo == -1)
+        {
+            dosDigitos = ultimo;
+        }
+        else
+        {
+            dosDigitos = penultimo * 10 + ultimo;
+        }
+
+        // asigación de grupitos
+        std::string grupo;
+
+        if (dosDigitos >= 0 && dosDigitos <= 39)
+        {
+            grupo = "Grupo A";
+        }
+        else if (dosDigitos >= 40 && dosDigitos <= 79)
+        {
+            grupo = "Grupo B";
+        }
+        else if (dosDigitos >= 80 && dosDigitos <= 99)
+        {
+            grupo = "Grupo C";
+        }
+        else
+        {
+            grupo = "Desconocido";
+        }
+
+        // Solo guardamos A/B/C
+        if (grupo == "Grupo A" || grupo == "Grupo B" || grupo == "Grupo C")
+        {
+            resultado.grupos[grupo].push_back(personaActual);
+            resultado.conteo[grupo] = resultado.conteo[grupo] + 1;
+        }
+    }
+
+    return resultado;
+}
 
 bool Persona::validarAsignacionCalendario(const Persona& persona, const std::string& grupoEsperado) {
     if (!persona.getDeclaranteRenta()) return false;
     std::string grupo = grupoDIAN2025(persona);
     return grupo == grupoEsperado;
 }
-int main() {
+int main()
+{
 
-    std::vector<Persona> personas = generarColeccion(1000);
+    std::vector<Persona> personas = generarColeccion(10);
 
-    // 2) Conteo por calendario usando la versión Ptr
-    std::map<std::string,int> conteo;
-    auto gruposPtr = Persona::agruparDeclarantesPorCalendarioPtr(personas, &conteo);
 
-    std::cout << "Declarantes por calendario (Ptr):\n";
-    std::cout << "Grupo A: " << conteo["Grupo A"] << "\n";
-    std::cout << "Grupo B: " << conteo["Grupo B"] << "\n";
-    std::cout << "Grupo C: " << conteo["Grupo C"] << "\n\n";
+    Persona::CalendarioAgrupadito resultado =
+        Persona::agruparDeclarantesPorCalendarioValor(personas);
 
-    // 3) Validar asignación (primeros 5 declarantes que encuentre)
-    std::cout << "Validaciones (primeros 5 declarantes):\n";
-    int mostrados = 0;
-    for (const auto& p : personas) {
-        if (!p.getDeclaranteRenta()) continue;
-        std::string g = Persona::grupoDIAN2025(p);
-        bool ok = Persona::validarAsignacionCalendario(p, g); // debe dar true
-        std::cout << " - " << p.getNombre() << " (" << p.getId()
-                  << ") -> " << g << " : " << (ok ? "OK" : "INCORRECTO") << "\n";
-        if (++mostrados == 5) break;
+
+    std::cout << "Conteo por calendario (VALOR):\n";
+
+    for (auto par : resultado.conteo)
+    {
+        std::string nombreGrupo = par.first;
+        int cantidad = par.second;
+
+        std::cout << "  " << nombreGrupo << ": " << cantidad << "\n";
     }
-    std::cout << "\n";
-
-    // 4) Listar algunos por grupo desde la versión Ptr (sin copias)
-    for (std::string key : {"Grupo A", "Grupo B", "Grupo C"}) {
-        std::cout << "Primeros 3 de " << key << ":\n";
-        const auto& vec = gruposPtr[key];
-        for (size_t i = 0; i < vec.size() && i < 3; ++i) {
-            const Persona* pp = vec[i];
-            std::cout << "   • " << pp->getNombre() << " " << pp->getApellido()
-                      << " (" << pp->getId() << ")\n";
-        }
-        std::cout << "\n";
-    }
-
-    // 5) (Ya lo tienes) persona más longeva en todo el dataset
-    std::cout << "Más longevo en todo el país: "
-              << Persona::personaMaxLongeva(personas) << "\n";
 
     return 0;
 }
