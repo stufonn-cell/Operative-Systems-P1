@@ -50,13 +50,13 @@ public:
     void mostrar() const;         // Muestra todos los detalles completos
     void mostrarResumen() const;  // Muestra versión compacta para listados
     int calcularEdad() const; // Calcula la edad a partir de la fecha de nacimiento
-    
+
     /* Funciones agrupadoras */
     static void agruparPorCiudad(std::vector<Persona> &personas, std::map<std::string, std::vector<Persona>> &grupos);
     static std::map<std::string, std::vector<Persona>> agruparPorCiudadValor(std::vector<Persona> &personas);
     static void agruparPorDeclaracion(std::vector<Persona> &personas, std::map<std::string, std::vector<Persona>> &grupos);
     static std::map<std::string, std::vector<Persona>> agruparPorDeclaracionValor(std::vector<Persona> &personas);
-    
+
     static std::string grupoDIAN2025(const Persona& persona);
     static std::map<std::string, std::vector<const Persona*>>
     agruparDeclarantesPorCalendarioPtr(const std::vector<Persona>& personas,
@@ -66,7 +66,7 @@ public:
     static bool validarAsignacionCalendario(const Persona& p, const std::string& grupoEsperado);
     static CalendarioAgrupadito
     agruparDeclarantesPorCalendarioValor(std::vector<Persona> personas);
-
+    static std::map<std::string, Persona> menorPatrimonioPorCiudad(const std::vector<Persona>& personas);
     /* Funciones de busqueda */
     static void personaMaxLongeva(std::vector<Persona> &personas, Persona &longeva);
     static Persona personaMaxLongevaValor(std::vector<Persona> personas);
