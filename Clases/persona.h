@@ -20,7 +20,8 @@ private:
     double patrimonio;            // Valor total de bienes y activos
     double deudas;                // Deudas pendientes
     bool declaranteRenta;         // Si está obligado a declarar renta
-
+    static int ultimosDosDigitosCC(const std::string& id);
+    static std::string grupoDIANusandoDigitos(int dd);
 public:
     // Constructor: Inicializa todos los campos de la persona
     Persona(std::string nom, std::string ape, std::string id,
@@ -46,6 +47,14 @@ public:
     static std::string personaMaxLongeva(std::vector<Persona> &personas);
     static std::string personaMaxLongevaValor(std::vector<Persona> personas);
     static std::map<std::string, std::vector<Persona>> agruparPorCiudad(std::vector<Persona> &personas);
+    static std::string grupoDIAN2025(const Persona& persona);
+    static std::map<std::string, std::vector<Persona>>
+    agruparDeclarantesPorCalendarioVal(const std::vector<Persona>& personas);
+    static std::map<std::string, std::vector<const Persona*>>
+    agruparDeclarantesPorCalendarioPtr(const std::vector<Persona>& personas);
+    static std::map<std::string, int>
+    contarDeclarantesPorCalendario(const std::vector<Persona>& personas);
+    static bool validarAsignacionCalendario(const Persona& p, const std::string& grupoEsperado);
 };
 
 #endif // PERSONA_H

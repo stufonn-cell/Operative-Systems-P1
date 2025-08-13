@@ -4,6 +4,8 @@
 #include <ctime> // Para obtener la fecha actual
 #include "generador.h"
 #include <map>
+#include <cctype>
+#include <stdexcept>
 
 // Implementación del constructor
 Persona::Persona(std::string nom, std::string ape, std::string id,
@@ -139,6 +141,39 @@ std::string Persona::personaMaxLongevaValor(std::vector<Persona> personas){
     return masLongevo.getNombre();
 }
 
+// ***************************** (3) Persona Mas Longeva *************************************
+int Persona::ultimosDosDigitosCC(const std::string& id){
+    int digito1= -1;
+    int digito2= -1;
+
+    for(int i = static_cast<int>(id.size()) -1; i >= 0; --i) {
+        unsigned char counter = static_cast<unsigned char>(id[i]);
+        if (std::isdigit(counter)) {
+            if (digito1 == -1) {
+                digito1 = counter - '0';
+            } else if (digito2 == -1) {
+                digito2 = counter - '0';
+                break;
+            }
+        }
+        if (digito1 = -1) return -1;
+        if (digito2 = -1) return digito1;
+        return digito2 * 10 + digito1;
+    }
+}
+
+std::string Persona::grupoDIANusandoDigitos(int dd){
+    if (dd < 0) return "Desconodido";
+    if (dd <= 39) return "Grupo A";
+    if (dd <= 79) return "Grupo B";
+    if (dd <= 99) return "Grupo C";
+    return "Desconocido";
+}
+
+std::string Persona::grupoDIAN2025(const Persona& persona) {
+    int digitos = ultimosDosDigitosCC(persona.getId());
+    return grupoDIANusandoDigitos(digitos);
+}
 int main() {
 
     std::vector<Persona> personas = generarColeccion(1000000);
