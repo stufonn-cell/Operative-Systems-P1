@@ -44,4 +44,44 @@ inline void Persona::mostrarResumen() const {
               << " | $" << std::fixed << std::setprecision(2) << ingresosAnuales;
 }
 
+inline void descomponerFechaYMD(const std::string& fechaISO, int& anio, int& mes, int& dia) {
+    anio = 0; mes = 0; dia = 0;
+    if (fechaISO.size() >= 10) {
+        anio = std::stoi(fechaISO.substr(0, 4));
+        mes  = std::stoi(fechaISO.substr(5, 2));
+        dia  = std::stoi(fechaISO.substr(8, 2));
+    }
+}
+
+inline void obtenerHoyYMD(int& anio, int& mes, int& dia) {
+    anio = 2025; mes = 12; dia = 28; // fija para resultados deterministas
+}
+
+inline int extraerUltimosDosDigitos(const std::string& documentoIdentidad) {
+    int ultimo = -1, penultimo = -1;
+    for (int i = static_cast<int>(documentoIdentidad.size()) - 1; i >= 0; --i) {
+        unsigned char c = static_cast<unsigned char>(documentoIdentidad[i]);
+        if (std::isdigit(c)) {
+            if (ultimo == -1) ultimo = c - '0';
+            else { penultimo = c - '0'; break; }
+        }
+    }
+    if (ultimo == -1) return -1;
+    if (penultimo == -1) return ultimo;
+    return penultimo * 10 + ultimo;
+}
+
+inline std::string grupoDIANDesdeDigitos(int ultimosDosDigitos) {
+    if (ultimosDosDigitos < 0)   return "Desconocido";
+    if (ultimosDosDigitos <= 39) return "Grupo A";
+    if (ultimosDosDigitos <= 79) return "Grupo B";
+    if (ultimosDosDigitos <= 99) return "Grupo C";
+    return "Desconocido";
+}
+
+inline std::string grupoDIAN2025(const Persona& persona) {
+    int ultimosDos = extraerUltimosDosDigitos(persona.id);
+    return grupoDIANDesdeDigitos(ultimosDos);
+}
+
 #endif // PERSONA_H
