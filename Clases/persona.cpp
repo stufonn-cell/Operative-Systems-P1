@@ -363,25 +363,56 @@ bool Persona::validarAsignacionCalendario(const Persona& persona, const std::str
     std::string grupo = grupoDIAN2025(persona);
     return grupo == grupoEsperado;
 }
+
+//===============================(4) Menor Patrimonio por Ciudad ==================================
+
+std::map<std::string, Persona> Persona::menorPatrimonioPorCiudad(const std::vector<Persona>& personas){
+
+    if(personas.empty()){
+        throw std::runtime_error("La lista está vacía");
+    }
+
+    std::map<std::string, Persona> pobrePorCiudad;
+
+    for(auto personita : personas){
+
+        std::string ciudad = personita.getCiudadNacimiento();
+
+        auto pobre = pobrePorCiudad.find(ciudad);
+
+        if(pobre == pobrePorCiudad.end()){
+            pobrePorCiudad.emplace(ciudad, personita);
+        }
+        else
+        {
+            if(personita.getPatrimonio() < pobre->second.getPatrimonio()){
+                pobre->second = personita;
+            }
+        }
+    }
+    return pobrePorCiudad;
+}
+
 int main()
 {
+    std::vector<Persona> personas = generarColeccion(1000);
 
-    std::vector<Persona> personas = generarColeccion(10);
+    std::map<std::string, Persona> resultado =
+        Persona::menorPatrimonioPorCiudad(personas);
 
+    std::cout << "Menor patrimonio por ciudad:\n\n";
 
-    Persona::CalendarioAgrupadito resultado =
-        Persona::agruparDeclarantesPorCalendarioValor(personas);
-
-
-    std::cout << "Conteo por calendario (VALOR):\n";
-
-    for (auto par : resultado.conteo)
+    for (auto par : resultado) // copia del par (por valor)
     {
-        std::string nombreGrupo = par.first;
-        int cantidad = par.second;
+        std::string ciudad = par.first;
+        Persona personaConMenorPatrimonio = par.second; // copia
 
-        std::cout << "  " << nombreGrupo << ": " << cantidad << "\n";
-    }
+        std::cout << "Ciudad: " << ciudad << "\n";
+        std::cout << "  Nombre: " << personaConMenorPatrimonio.getNombre()
+                  << " " << personaConMenorPatrimonio.getApellido() << "\n";
+        std::cout << "  ID: " << personaConMenorPatrimonio.getId() << "\n";
+        std::cout << "  Patrimonio: " << personaConMenorPatrimonio.getPatrimonio() << "\n\n";
+        }
 
     return 0;
 }
