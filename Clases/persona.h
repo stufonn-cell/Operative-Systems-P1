@@ -29,6 +29,8 @@ public:
             std::map<std::string, std::vector<Persona>> grupos;
             std::map<std::string, int> conteo;
         };
+    
+    Persona(); // Constructor por defecto
     // Constructor: Inicializa todos los campos de la persona
     Persona(std::string nom, std::string ape, std::string id,
             std::string ciudad, std::string fecha, double ingresos,
@@ -52,10 +54,10 @@ public:
     int calcularEdad() const; // Calcula la edad a partir de la fecha de nacimiento
 
     /* Funciones agrupadoras */
-    static void agruparPorCiudad(std::vector<Persona> &personas, std::map<std::string, std::vector<Persona>> &grupos);
-    static std::map<std::string, std::vector<Persona>> agruparPorCiudadValor(std::vector<Persona> &personas);
-    static void agruparPorDeclaracion(std::vector<Persona> &personas, std::map<std::string, std::vector<Persona>> &grupos);
-    static std::map<std::string, std::vector<Persona>> agruparPorDeclaracionValor(std::vector<Persona> &personas);
+    static void agruparPorCiudad(const std::vector<Persona> &personas, std::map<std::string, std::vector<Persona>> &grupos);
+    static std::map<std::string, std::vector<Persona>> agruparPorCiudadValor(const std::vector<Persona> personas);
+    static void agruparPorDeclaracion(const std::vector<Persona> &personas, std::map<std::string, std::vector<Persona>> &grupos);
+    static std::map<std::string, std::vector<Persona>> agruparPorDeclaracionValor(const std::vector<Persona> personas);
 
     static std::string grupoDIAN2025(const Persona& persona);
     static std::map<std::string, std::vector<const Persona*>>
@@ -66,12 +68,15 @@ public:
     static bool validarAsignacionCalendario(const Persona& p, const std::string& grupoEsperado);
     static CalendarioAgrupadito
     agruparDeclarantesPorCalendarioValor(std::vector<Persona> personas);
-    static std::map<std::string, Persona> menorPatrimonioPorCiudad(const std::vector<Persona>& personas);
+    
     /* Funciones de busqueda */
-    static void personaMaxLongeva(std::vector<Persona> &personas, Persona &longeva);
-    static Persona personaMaxLongevaValor(std::vector<Persona> personas);
-    static void personaMaxPatrimonio(std::vector<Persona> &personas, Persona &maxPatrimonio);
-    static Persona personaMaxPatrimonioValor(std::vector<Persona> &personas);
+    static void personaMaxLongeva(const std::vector<Persona> &personas, Persona &longeva);
+    static Persona personaMaxLongevaValor(const std::vector<Persona> personas);
+    static void personaMaxPatrimonio(const std::vector<Persona> &personas, Persona &maxPatrimonio);
+    static Persona personaMaxPatrimonioValor(const std::vector<Persona> personas);
+    static void personaMinPatrimonio(const std::vector<Persona>& personas, Persona &minPatrimonio);
+    static Persona personaMinPatrimonioValor(const std::vector<Persona> personas);
+
 };
 
 #endif // PERSONA_H

@@ -8,6 +8,9 @@
 #include "persona.h"
 #include "generador.h"
 
+// Constructor por defecto
+Persona::Persona(){}
+
 // Implementación del constructor
 Persona::Persona(std::string nom, std::string ape, std::string id,
                  std::string ciudad, std::string fecha, double ingresos,
@@ -96,7 +99,7 @@ int Persona::calcularEdad() const {
     return edad;
 }
 
-std::map<std::string, std::vector<Persona>> Persona::agruparPorCiudadValor(std::vector<Persona> &personas){
+std::map<std::string, std::vector<Persona>> Persona::agruparPorCiudadValor(const std::vector<Persona> personas){
     std::map<std::string, std::vector<Persona>> grupos;
 
     for(const auto &persona : personas){
@@ -108,7 +111,7 @@ std::map<std::string, std::vector<Persona>> Persona::agruparPorCiudadValor(std::
     return grupos;
 }
 
-void Persona::agruparPorCiudad(std::vector<Persona> &personas,
+void Persona::agruparPorCiudad(const std::vector<Persona> &personas,
                                std::map<std::string, std::vector<Persona>> &grupos) {
 
     for(const auto &persona : personas){
@@ -118,7 +121,7 @@ void Persona::agruparPorCiudad(std::vector<Persona> &personas,
     }
 }
 
-void Persona::agruparPorDeclaracion(std::vector<Persona> &personas,
+void Persona::agruparPorDeclaracion(const std::vector<Persona> &personas,
                                     std::map<std::string, std::vector<Persona>> &grupos) {
     for(const auto &persona : personas){
         std::string documento = persona.getId();
@@ -131,7 +134,7 @@ void Persona::agruparPorDeclaracion(std::vector<Persona> &personas,
     }
 }
 
-std::map<std::string, std::vector<Persona>> Persona::agruparPorDeclaracionValor(std::vector<Persona> &personas) {
+std::map<std::string, std::vector<Persona>> Persona::agruparPorDeclaracionValor(const std::vector<Persona> personas) {
     std::map<std::string, std::vector<Persona>> grupos;
 
     for(const auto &persona : personas){
@@ -149,7 +152,7 @@ std::map<std::string, std::vector<Persona>> Persona::agruparPorDeclaracionValor(
 
 
 // ***************************** (1) Persona Mas Longeva *************************************
-void Persona::personaMaxLongeva(std::vector<Persona> &personas, Persona &longeva){
+void Persona::personaMaxLongeva(const std::vector<Persona> &personas, Persona &longeva){
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -161,7 +164,7 @@ void Persona::personaMaxLongeva(std::vector<Persona> &personas, Persona &longeva
                 });
 }
 
-Persona Persona::personaMaxLongevaValor(std::vector<Persona> personas){
+Persona Persona::personaMaxLongevaValor(const std::vector<Persona> personas){
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -176,7 +179,7 @@ Persona Persona::personaMaxLongevaValor(std::vector<Persona> personas){
 
 // ***************************** (2) Persona con Mayor Patrimonio *************************************
 
-void Persona::personaMaxPatrimonio(std::vector<Persona> &personas, Persona &maxPatrimonio) {
+void Persona::personaMaxPatrimonio(const std::vector<Persona> &personas, Persona &maxPatrimonio) {
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -188,7 +191,7 @@ void Persona::personaMaxPatrimonio(std::vector<Persona> &personas, Persona &maxP
                     });
 }
 
-Persona Persona::personaMaxPatrimonioValor(std::vector<Persona> &personas) {
+Persona Persona::personaMaxPatrimonioValor(const std::vector<Persona> personas) {
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -366,53 +369,58 @@ bool Persona::validarAsignacionCalendario(const Persona& persona, const std::str
 
 //===============================(4) Menor Patrimonio por Ciudad ==================================
 
-std::map<std::string, Persona> Persona::menorPatrimonioPorCiudad(const std::vector<Persona>& personas){
-
+void Persona::personaMinPatrimonio(const std::vector<Persona> &personas, Persona &minPatrimonio){
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
+    
+    minPatrimonio = *std::min_element(personas.begin(), personas.end(),
+                    [](const Persona &a, const Persona &b) {
+                        return a.getPatrimonio() < b.getPatrimonio();
+                    });
+}
 
-    std::map<std::string, Persona> pobrePorCiudad;
-
-    for(auto personita : personas){
-
-        std::string ciudad = personita.getCiudadNacimiento();
-
-        auto pobre = pobrePorCiudad.find(ciudad);
-
-        if(pobre == pobrePorCiudad.end()){
-            pobrePorCiudad.emplace(ciudad, personita);
-        }
-        else
-        {
-            if(personita.getPatrimonio() < pobre->second.getPatrimonio()){
-                pobre->second = personita;
-            }
-        }
+Persona Persona::personaMinPatrimonioValor(const std::vector<Persona> personas){
+    if(personas.empty()){
+        throw std::runtime_error("La lista está vacía");
     }
-    return pobrePorCiudad;
+    
+    return *std::min_element(personas.begin(), personas.end(),
+                    [](const Persona &a, const Persona &b) {
+                        return a.getPatrimonio() < b.getPatrimonio();
+                    });
 }
 
 int main()
 {
-    std::vector<Persona> personas = generarColeccion(1000);
+    std::vector<Persona> personas = generarColeccion(5000000);
 
-    std::map<std::string, Persona> resultado =
-        Persona::menorPatrimonioPorCiudad(personas);
+    std::map<std::string, std::vector<Persona>> agrupado;
 
-    std::cout << "Menor patrimonio por ciudad:\n\n";
+    Persona::agruparPorCiudad(personas, agrupado);
 
-    for (auto par : resultado) // copia del par (por valor)
-    {
-        std::string ciudad = par.first;
-        Persona personaConMenorPatrimonio = par.second; // copia
+    for (auto par: agrupado) {
+        Persona patrimonioMin;
+        Persona::personaMinPatrimonio(par.second, patrimonioMin);
+        std::cout << "La persona con el menor patrimonio en " << par.first << " es " << patrimonioMin.getNombre() << " " << patrimonioMin.getApellido() << " con un patrimonio de " << patrimonioMin.getPatrimonio() << ".\n";
+    }
 
-        std::cout << "Ciudad: " << ciudad << "\n";
-        std::cout << "  Nombre: " << personaConMenorPatrimonio.getNombre()
-                  << " " << personaConMenorPatrimonio.getApellido() << "\n";
-        std::cout << "  ID: " << personaConMenorPatrimonio.getId() << "\n";
-        std::cout << "  Patrimonio: " << personaConMenorPatrimonio.getPatrimonio() << "\n\n";
-        }
+    // std::map<std::string, Persona> resultado =
+    //     Persona::menorPatrimonioPorCiudad(personas);
+
+    // std::cout << "Menor patrimonio por ciudad:\n\n";
+
+    // for (auto par : resultado) // copia del par (por valor)
+    // {
+    //     std::string ciudad = par.first;
+    //     Persona personaConMenorPatrimonio = par.second; // copia
+
+    //     std::cout << "Ciudad: " << ciudad << "\n";
+    //     std::cout << "  Nombre: " << personaConMenorPatrimonio.getNombre()
+    //               << " " << personaConMenorPatrimonio.getApellido() << "\n";
+    //     std::cout << "  ID: " << personaConMenorPatrimonio.getId() << "\n";
+    //     std::cout << "  Patrimonio: " << personaConMenorPatrimonio.getPatrimonio() << "\n\n";
+    //     }
 
     return 0;
 }
