@@ -99,6 +99,52 @@ inline int calcularEdad(const Persona& persona) {
 }
 //
 
+//================================ Agrupar por ciudad ============================================
+inline std::map<std::string, std::vector<Persona>>
+agruparPorCiudad_valor(const std::vector<Persona> personas) {
+
+    std::map<std::string, std::vector<Persona>> grupos;
+    for (const auto p : personas) grupos[p.ciudadNacimiento].push_back(p);
+
+    return grupos;
+}
+
+
+inline void agruparPorCiudad_ref(const std::vector<Persona>& personas,
+    std::map<std::string, std::vector<Persona>>& grupos) {
+
+    grupos.clear();
+    for (const auto& p : personas) grupos[p.ciudadNacimiento].push_back(p);
+}
+
+// ================================ Agrupar por declaración ==========================================
+inline void agruparPorDeclaracion_ptr(
+    std::vector<Persona>& personas,
+    std::map<std::string, std::vector<Persona*>>& grupos)
+{
+    grupos.clear();
+    for (auto& p : personas) {
+        int dd = extraerUltimosDosDigitos(p.id);
+        std::string etiqueta = grupoDIANDesdeDigitos(dd);
+        if (etiqueta == "Grupo A" || etiqueta == "Grupo B" || etiqueta == "Grupo C") {
+            grupos[etiqueta].push_back(&p);
+        }
+    }
+}
+
+inline void agruparPorDeclaracion_valor(
+std::vector<Persona> personas,std::map<std::string, std::vector<Persona>> grupos)
+{
+    grupos.clear();
+    for (auto p : personas) {
+        int dd = extraerUltimosDosDigitos(p.id);
+        std::string etiqueta = grupoDIANDesdeDigitos(dd);
+        if (etiqueta == "Grupo A" || etiqueta == "Grupo B" || etiqueta == "Grupo C") {
+            grupos[etiqueta].push_back(p);
+        }
+    }
+}
+
 // ***************************** (1) Persona Mas Longeva *************************************
 
 inline const Persona* personaMaxLongevaPointr(std::vector<Persona>& personas){
