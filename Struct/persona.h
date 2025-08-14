@@ -135,29 +135,82 @@ inline Persona personaMaxLongeva(std::vector<Persona> personas) {
 
 // ***************************** (2) Persona con Mayor Patrimonio *************************************
 
-void Persona::personaMaxPatrimonio(std::vector<Persona> &personas, Persona &maxPatrimonio) {
+inline Persona personaMaxPatrimonioValor(std::vector<Persona> personas) {
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
-
-    maxPatrimonio = *std::max_element(personas.begin(), personas.end(),
-                    [](const Persona &a, const Persona &b)
-                    {
-                        return a.getPatrimonio() < b.getPatrimonio();
-                    });
-}
-
-Persona Persona::personaMaxPatrimonioValor(std::vector<Persona> &personas) {
-    if(personas.empty()){
-        throw std::runtime_error("La lista está vacía");
-    }
-
     return *std::max_element(personas.begin(), personas.end(),
-            [](const Persona &a, const Persona &b)
-            {
-                return a.getPatrimonio() < b.getPatrimonio();
-            });
+        [](const Persona& a, const Persona& b)
+        {
+        return a.patrimonio < b.patrimonio;
+        }
+    );
 }
 
+inline const Persona*
+personaMayorPatrimonio_ptr(const std::vector<Persona>& listaPersonasEntrada) {
+    if (listaPersonasEntrada.empty()) throw std::runtime_error("La lista está vacía");
+    const Persona* punteroMayorPatrimonio = &listaPersonasEntrada[0];
+    for (const auto& personaActual : listaPersonasEntrada) {
+        if (personaActual.patrimonio > punteroMayorPatrimonio->patrimonio) {
+            punteroMayorPatrimonio = &personaActual;
+        }
+    }
+    return punteroMayorPatrimonio;
+}
+
+
+inline std::map<std::string, Persona>
+MenorPatrimonioPorCiudad_valor(std::vector<Persona> listaCompletaDePersonas) {
+    if (listaCompletaDePersonas.empty()) {
+        throw std::runtime_error("La lista de personas está vacía");
+    }
+
+    std::map<std::string, Persona> mapaCiudadAPersonaConMenorPatrimonio;
+
+    for (auto personaEvaluada : listaCompletaDePersonas) {
+        const std::string nombreCiudadNacimiento = personaEvaluada.ciudadNacimiento;
+
+        auto iteradorCiudad = mapaCiudadAPersonaConMenorPatrimonio.find(nombreCiudadNacimiento);
+
+        if (iteradorCiudad == mapaCiudadAPersonaConMenorPatrimonio.end()) {
+            // Si no existe la ciudad, se agrega la persona
+            mapaCiudadAPersonaConMenorPatrimonio.emplace(nombreCiudadNacimiento, personaEvaluada);
+        } else {
+
+            if (personaEvaluada.patrimonio < iteradorCiudad->second.patrimonio) {
+                iteradorCiudad->second = personaEvaluada;
+            }
+        }
+    }
+
+    return mapaCiudadAPersonaConMenorPatrimonio;
+}
+
+
+inline std::map<std::string, const Persona*>
+PersonaConMenorPatrimonioPorCiudad_ptr(const std::vector<Persona>& listaCompletaDePersonas) {
+    if (listaCompletaDePersonas.empty()) {
+        throw std::runtime_error("La lista de personas está vacía");
+    }
+
+    std::map<std::string, const Persona*> mapaCiudadAPunteroAMenorPatrimonio;
+
+    for (const auto& personaEvaluada : listaCompletaDePersonas) {
+        const std::string& nombreCiudadNacimiento = personaEvaluada.ciudadNacimiento;
+
+        auto iteradorCiudad = mapaCiudadAPunteroAMenorPatrimonio.find(nombreCiudadNacimiento);
+
+        if (iteradorCiudad == mapaCiudadAPunteroAMenorPatrimonio.end()) {
+            // Si no existe la ciudad, se agrega un puntero a la persona
+            mapaCiudadAPunteroAMenorPatrimonio.emplace(nombreCiudadNacimiento, &personaEvaluada);
+        } else if (personaEvaluada.patrimonio < iteradorCiudad->second->patrimonio) {
+
+            iteradorCiudad->second = &personaEvaluada;
+        }
+    }
+
+    return mapaCiudadAPunteroAMenorPatrimonio;
+}
 
 #endif // PERSONA_H
