@@ -4,6 +4,11 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <stdexcept>
+#include <cctype>
 
 // Estructura que representa una persona con datos personales y fiscales
 struct Persona {
@@ -83,5 +88,76 @@ inline std::string grupoDIAN2025(const Persona& persona) {
     int ultimosDos = extraerUltimosDosDigitos(persona.id);
     return grupoDIANDesdeDigitos(ultimosDos);
 }
+
+inline int calcularEdad(const Persona& persona) {
+    int anioN, mesN, diaN; descomponerFechaYMD(persona.fechaNacimiento, anioN, mesN, diaN);
+    int anioH, mesH, diaH; obtenerHoyYMD(anioH, mesH, diaH);
+
+    int edad = anioH - anioN;
+    if (mesH < mesN || (mesH == mesN && diaH < diaN)) --edad;
+    return edad;
+}
+//
+
+// ***************************** (1) Persona Mas Longeva *************************************
+
+inline const Persona* personaMaxLongevaPointr(std::vector<Persona>& personas){
+    if(personas.empty()){
+        throw std::runtime_error("La lista está vacía");
+    }
+    const Persona* punteroMasLongeva = &personas[0];
+    for (const auto& personaActual : personas) {
+        if (calcularEdad(personaActual) > calcularEdad(*punteroMasLongeva)) {
+            punteroMasLongeva = &personaActual;
+        }
+    }
+    return punteroMasLongeva;
+}
+
+inline Persona personaMaxLongeva(std::vector<Persona> personas) {
+    if (personas.empty()) {
+        throw std::runtime_error("La lista está vacía");
+    }
+
+    // candidato actual (copia)
+    Persona masLongeva = personas[0];
+
+    // recorre por VALOR (copia cada elemento)
+    for (auto personaActual : personas) {
+        if (calcularEdad(personaActual) > calcularEdad(masLongeva)) {
+            masLongeva = personaActual; // reemplaza el candidato
+        }
+    }
+
+    return masLongeva; // devuelve por valor
+}
+
+
+// ***************************** (2) Persona con Mayor Patrimonio *************************************
+
+void Persona::personaMaxPatrimonio(std::vector<Persona> &personas, Persona &maxPatrimonio) {
+    if(personas.empty()){
+        throw std::runtime_error("La lista está vacía");
+    }
+
+    maxPatrimonio = *std::max_element(personas.begin(), personas.end(),
+                    [](const Persona &a, const Persona &b)
+                    {
+                        return a.getPatrimonio() < b.getPatrimonio();
+                    });
+}
+
+Persona Persona::personaMaxPatrimonioValor(std::vector<Persona> &personas) {
+    if(personas.empty()){
+        throw std::runtime_error("La lista está vacía");
+    }
+
+    return *std::max_element(personas.begin(), personas.end(),
+            [](const Persona &a, const Persona &b)
+            {
+                return a.getPatrimonio() < b.getPatrimonio();
+            });
+}
+
 
 #endif // PERSONA_H
