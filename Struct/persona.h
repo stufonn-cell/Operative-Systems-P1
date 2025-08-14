@@ -259,4 +259,46 @@ PersonaConMenorPatrimonioPorCiudad_ptr(const std::vector<Persona>& listaCompleta
     return mapaCiudadAPunteroAMenorPatrimonio;
 }
 
+// ==================== Agrupar por calendario DIAN 2025 ===========================
+struct CalendarioAgrupadito {
+    std::map<std::string, std::vector<Persona>> grupos;
+    std::map<std::string, int> conteo;
+};
+
+inline std::map<std::string, std::vector<const Persona*>>
+agruparDeclarantesPorCalendario_ptr(const std::vector<Persona>& personas,
+std::map<std::string, int>* contador = nullptr) {
+
+    std::map<std::string, std::vector<const Persona*>> grupos;
+    if (contador) { (*contador)["Grupo A"]=0; (*contador)["Grupo B"]=0; (*contador)["Grupo C"]=0; }
+
+    for (const auto& personita : personas) {
+        if (!personita.declaranteRenta)
+            continue;
+        std::string grupito = grupoDIAN2025(personita);
+        if (grupito=="Grupo A" || grupito=="Grupo B" || grupito=="Grupo C") {
+            grupos[grupito].push_back(&personita);
+            if (contador) ++(*contador)[grupito];
+        }
+    }
+    return grupos;
+}
+
+
+inline CalendarioAgrupadito
+agruparDeclarantesPorCalendario_valor(const std::vector<Persona> personas) {
+    CalendarioAgrupadito res;
+    res.grupos["Grupo A"]; res.grupos["Grupo B"]; res.grupos["Grupo C"];
+    res.conteo["Grupo A"]=0; res.conteo["Grupo B"]=0; res.conteo["Grupo C"]=0;
+
+    for (const auto personita : personas) {
+        if (!personita.declaranteRenta) continue;
+        std::string grupito = grupoDIAN2025(personita);
+        if (grupito=="Grupo A" || grupito=="Grupo B" || grupito=="Grupo C") {
+            res.grupos[grupito].push_back(personita);
+            ++res.conteo[grupito];
+        }
+    }
+    return res;
+}
 #endif // PERSONA_H
