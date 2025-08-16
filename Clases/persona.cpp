@@ -391,19 +391,91 @@ Persona Persona::personaMinPatrimonioValor(const std::vector<Persona> personas){
                     });
 }
 
+//===============================(5) Mayor Deuda en el pais ==================================
+
+void Persona::personaMaxDeuda(const std::vector<Persona> &personas, Persona &maxDeuda) {
+    if(personas.empty()){
+        throw std::runtime_error("La lista está vacía");
+    }
+
+    maxDeuda = *std::max_element(personas.begin(), personas.end(),
+            [](const Persona &a, const Persona &b)
+            {
+                return a.getDeudas() < b.getDeudas();
+            });
+}
+
+Persona Persona::personaMaxDeudaValor(const std::vector<Persona> personas) {
+    if(personas.empty()){
+        throw std::runtime_error("La lista está vacía");
+    }
+
+    return *std::max_element(personas.begin(), personas.end(),
+            [](const Persona &a, const Persona &b)
+            {
+                return a.getDeudas() < b.getDeudas();
+            });
+}
+
+//===============================(6) Declarantes por ciudad ==================================
+
+std::map<std::string, std::vector<Persona>> Persona::declarantePorCiudadValor(const std::vector<Persona> personas) {
+    std::map<std::string, std::vector<Persona>> resultado = Persona::agruparPorCiudadValor(personas);
+
+    for (auto& par : resultado) {
+        std::vector<Persona>& grupo = par.second;
+        grupo.erase(std::remove_if(grupo.begin(), grupo.end(),
+                                    [](const Persona& p) {
+                                        return !p.getDeclaranteRenta();
+                                    }), grupo.end());
+    }
+
+    return resultado;
+}
+
+void Persona::declarantePorCiudad(const std::vector<Persona> &personas,
+                                    std::map<std::string, std::vector<Persona>> &grupos) {
+
+    Persona::agruparPorCiudad(personas, grupos);
+
+    for (auto &par : grupos) {
+        std::vector<Persona> &grupo = par.second;
+        grupo.erase(std::remove_if(grupo.begin(), grupo.end(),
+                                    [](const Persona& p) {
+                                        return !p.getDeclaranteRenta();
+                                    }), grupo.end());
+    }
+
+}
+
+
 int main()
 {
-    std::vector<Persona> personas = generarColeccion(5000000);
+    std::vector<Persona> personas = generarColeccion(1000000);
 
     std::map<std::string, std::vector<Persona>> agrupado;
+    auto agrupado2 = Persona::declarantePorCiudadValor(personas);
+    Persona::declarantePorCiudad(personas, agrupado);
 
-    Persona::agruparPorCiudad(personas, agrupado);
-
+    long total = 0;
     for (auto par: agrupado) {
-        Persona patrimonioMin;
-        Persona::personaMinPatrimonio(par.second, patrimonioMin);
-        std::cout << "La persona con el menor patrimonio en " << par.first << " es " << patrimonioMin.getNombre() << " " << patrimonioMin.getApellido() << " con un patrimonio de " << patrimonioMin.getPatrimonio() << ".\n";
+        int declarantes = par.second.size();
+        std::cout << "Ciudad: " << par.first << " | Declarantes: " << declarantes << "\n";
+        total += declarantes;
     }
+
+    std::cout << "Total de declarantes: " << total << "\n";
+
+    std::cout << "=============================\n";
+
+    total = 0;
+    for (auto par: agrupado) {
+        int declarantes = par.second.size();
+        std::cout << "Ciudad: " << par.first << " | Declarantes: " << declarantes << "\n";
+        total += declarantes;
+    }
+
+    std::cout << "Total de declarantes: " << total << "\n";
 
     // std::map<std::string, Persona> resultado =
     //     Persona::menorPatrimonioPorCiudad(personas);

@@ -58,6 +58,9 @@ public:
     static std::map<std::string, std::vector<Persona>> agruparPorCiudadValor(const std::vector<Persona> personas);
     static void agruparPorDeclaracion(const std::vector<Persona> &personas, std::map<std::string, std::vector<Persona>> &grupos);
     static std::map<std::string, std::vector<Persona>> agruparPorDeclaracionValor(const std::vector<Persona> personas);
+    static void declarantePorCiudad(const std::vector<Persona> &personas, std::map<std::string, std::vector<Persona>> &grupos);
+    static std::map<std::string, std::vector<Persona>> declarantePorCiudadValor(const std::vector<Persona> personas);
+
 
     static std::string grupoDIAN2025(const Persona& persona);
     static std::map<std::string, std::vector<const Persona*>>
@@ -76,6 +79,8 @@ public:
     static Persona personaMaxPatrimonioValor(const std::vector<Persona> personas);
     static void personaMinPatrimonio(const std::vector<Persona>& personas, Persona &minPatrimonio);
     static Persona personaMinPatrimonioValor(const std::vector<Persona> personas);
+    static void personaMaxDeuda(const std::vector<Persona> &personas, Persona &maxDeuda);
+    static Persona personaMaxDeudaValor(const std::vector<Persona> personas);
 
 };
 
