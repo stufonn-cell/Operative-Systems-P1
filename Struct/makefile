@@ -5,7 +5,7 @@ CXX := g++ # Usa el compilador g++
 CXXFLAGS := -Wall -Wextra -pedantic -std=c++11 # Opciones de compilación
 
 # Archivos fuente y objetos
-SRCS := generador.cpp main.cpp # Persona.h es header-only ahora
+SRCS := generador.cpp monitor.cpp main.cpp # Persona.h es header-only ahora
 OBJS := $(SRCS:.cpp=.o)
 EXEC := programa # Nombre del ejecutable final
 
@@ -20,6 +20,9 @@ $(EXEC): $(OBJS)
 
 # generador.o depende de generador.cpp y sus headers
 generador.o: generador.cpp generador.h persona.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+monitor.o: monitor.cpp monitor.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # main.o depende de main.cpp y sus headers

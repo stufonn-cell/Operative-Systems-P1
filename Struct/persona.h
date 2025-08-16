@@ -62,7 +62,7 @@ inline void obtenerHoyYMD(int& anio, int& mes, int& dia) {
     anio = 2025; mes = 12; dia = 28; // fija para resultados deterministas
 }
 
-int extraerUltimosDosDigitos(const std::string& documentoIdentidad) {
+inline int extraerUltimosDosDigitos(const std::string& documentoIdentidad) {
     int ultimo = -1, penultimo = -1;
     for (int i = static_cast<int>(documentoIdentidad.size()) - 1; i >= 0; --i) {
         unsigned char c = static_cast<unsigned char>(documentoIdentidad[i]);
@@ -76,7 +76,7 @@ int extraerUltimosDosDigitos(const std::string& documentoIdentidad) {
     return penultimo * 10 + ultimo;
 }
 
-std::string grupoDIANDesdeDigitos(int ultimosDosDigitos) {
+inline std::string grupoDIANDesdeDigitos(int ultimosDosDigitos) {
     if (ultimosDosDigitos < 0)   return "Desconocido";
     if (ultimosDosDigitos <= 39) return "Grupo A";
     if (ultimosDosDigitos <= 79) return "Grupo B";
@@ -84,12 +84,12 @@ std::string grupoDIANDesdeDigitos(int ultimosDosDigitos) {
     return "Desconocido";
 }
 
-std::string grupoDIAN2025(const Persona& persona) {
+inline std::string grupoDIAN2025(const Persona& persona) {
     int ultimosDos = extraerUltimosDosDigitos(persona.id);
     return grupoDIANDesdeDigitos(ultimosDos);
 }
 
-int calcularEdad(const Persona& persona) {
+inline int calcularEdad(const Persona& persona) {
     int anioN, mesN, diaN; descomponerFechaYMD(persona.fechaNacimiento, anioN, mesN, diaN);
     int anioH, mesH, diaH; obtenerHoyYMD(anioH, mesH, diaH);
 
@@ -100,7 +100,7 @@ int calcularEdad(const Persona& persona) {
 //
 
 //================================ Agrupar por ciudad ============================================
-std::map<std::string, std::vector<Persona>>
+inline std::map<std::string, std::vector<Persona>>
 agruparPorCiudadValor(const std::vector<Persona> personas) {
 
     std::map<std::string, std::vector<Persona>> grupos;
@@ -110,7 +110,7 @@ agruparPorCiudadValor(const std::vector<Persona> personas) {
 }
 
 
-void agruparPorCiudad(const std::vector<Persona>& personas,
+inline void agruparPorCiudad(const std::vector<Persona>& personas,
     std::map<std::string, std::vector<Persona>>& grupos) {
 
     grupos.clear();
@@ -118,7 +118,7 @@ void agruparPorCiudad(const std::vector<Persona>& personas,
 }
 
 // ================================ Agrupar por declaración ==========================================
-void agruparPorDeclaracion(
+inline void agruparPorDeclaracion(
     std::vector<Persona>& personas,
     std::map<std::string, std::vector<Persona*>>& grupos)
 {
@@ -132,7 +132,7 @@ void agruparPorDeclaracion(
     }
 }
 
-void agruparPorDeclaracionValor(
+inline void agruparPorDeclaracionValor(
 std::vector<Persona> personas,std::map<std::string, std::vector<Persona>> grupos)
 {
     grupos.clear();
@@ -147,7 +147,7 @@ std::vector<Persona> personas,std::map<std::string, std::vector<Persona>> grupos
 
 // ***************************** (1) Persona Mas Longeva *************************************
 
-void personaMaxLongeva(const std::vector<Persona> &personas, Persona &longeva){
+inline void personaMaxLongeva(const std::vector<Persona> &personas, Persona &longeva){
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -159,7 +159,7 @@ void personaMaxLongeva(const std::vector<Persona> &personas, Persona &longeva){
                 });
 }
 
-Persona personaMaxLongevaValor(std::vector<Persona> personas) {
+inline Persona personaMaxLongevaValor(std::vector<Persona> personas) {
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -174,7 +174,7 @@ Persona personaMaxLongevaValor(std::vector<Persona> personas) {
 
 // ***************************** (2) Persona con Mayor Patrimonio *************************************
 
-void personaMaxPatrimonio(const std::vector<Persona> &personas, Persona &maxPatrimonio) {
+inline void personaMaxPatrimonio(const std::vector<Persona> &personas, Persona &maxPatrimonio) {
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -186,7 +186,7 @@ void personaMaxPatrimonio(const std::vector<Persona> &personas, Persona &maxPatr
                     });
 }
 
-Persona personaMaxPatrimonioValor(std::vector<Persona> personas) {
+inline Persona personaMaxPatrimonioValor(std::vector<Persona> personas) {
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -199,7 +199,7 @@ Persona personaMaxPatrimonioValor(std::vector<Persona> personas) {
 }
 
 // ***************************** (4) Persona con Menor Patrimonio *************************************
-void personaMinPatrimonio(const std::vector<Persona> &personas, Persona &minPatrimonio){
+inline void personaMinPatrimonio(const std::vector<Persona> &personas, Persona &minPatrimonio){
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -210,7 +210,7 @@ void personaMinPatrimonio(const std::vector<Persona> &personas, Persona &minPatr
                     });
 }
 
-Persona personaMinPatrimonioValor(const std::vector<Persona> personas){
+inline Persona personaMinPatrimonioValor(const std::vector<Persona> personas){
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -223,7 +223,7 @@ Persona personaMinPatrimonioValor(const std::vector<Persona> personas){
 
 // ***************************** (5) Mayor deuda en el pais  *************************************
 
-void personaMaxDeuda(const std::vector<Persona> &personas, Persona &maxDeuda) {
+inline void personaMaxDeuda(const std::vector<Persona> &personas, Persona &maxDeuda) {
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -235,7 +235,7 @@ void personaMaxDeuda(const std::vector<Persona> &personas, Persona &maxDeuda) {
             });
 }
 
-Persona personaMaxDeudaValor(const std::vector<Persona> personas) {
+inline Persona personaMaxDeudaValor(const std::vector<Persona> personas) {
     if(personas.empty()){
         throw std::runtime_error("La lista está vacía");
     }
@@ -249,7 +249,7 @@ Persona personaMaxDeudaValor(const std::vector<Persona> personas) {
 
 //===============================(6) Declarantes por ciudad ==================================
 
-std::map<std::string, std::vector<Persona>> declarantePorCiudadValor(const std::vector<Persona> personas) {
+inline std::map<std::string, std::vector<Persona>> declarantePorCiudadValor(const std::vector<Persona> personas) {
     std::map<std::string, std::vector<Persona>> resultado = agruparPorCiudadValor(personas);
 
     for (auto& par : resultado) {
@@ -263,7 +263,7 @@ std::map<std::string, std::vector<Persona>> declarantePorCiudadValor(const std::
     return resultado;
 }
 
-void declarantePorCiudad(const std::vector<Persona> &personas,
+inline void declarantePorCiudad(const std::vector<Persona> &personas,
                                     std::map<std::string, std::vector<Persona>> &grupos) {
 
     agruparPorCiudad(personas, grupos);
@@ -284,7 +284,7 @@ struct CalendarioAgrupadito {
     std::map<std::string, int> conteo;
 };
 
-std::map<std::string, std::vector<const Persona*>>
+inline std::map<std::string, std::vector<const Persona*>>
 agruparDeclarantesPorCalendario_ptr(const std::vector<Persona>& personas,
 std::map<std::string, int>* contador = nullptr) {
 
@@ -304,7 +304,7 @@ std::map<std::string, int>* contador = nullptr) {
 }
 
 
-CalendarioAgrupadito
+inline CalendarioAgrupadito
 agruparDeclarantesPorCalendario_valor(const std::vector<Persona> personas) {
     CalendarioAgrupadito res;
     res.grupos["Grupo A"]; res.grupos["Grupo B"]; res.grupos["Grupo C"];
@@ -320,4 +320,4 @@ agruparDeclarantesPorCalendario_valor(const std::vector<Persona> personas) {
     }
     return res;
 }
-#endif // PERSONA_H
+#endif
