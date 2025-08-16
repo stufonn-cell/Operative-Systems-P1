@@ -128,9 +128,9 @@ void Persona::agruparPorDeclaracion(const std::vector<Persona> &personas,
         std::string ultimosDigitos = documento.substr( (documento.size() - 2) );
         int digitosNumericos = std::stoi(ultimosDigitos);
 
-        if (digitosNumericos <= 39) grupos["<39"].push_back(persona);
-        else if (digitosNumericos <= 79) grupos["<79"].push_back(persona);
-        else if (digitosNumericos <= 99) grupos["<99"].push_back(persona);
+        if (digitosNumericos <= 39) grupos["A"].push_back(persona);
+        else if (digitosNumericos <= 79) grupos["B"].push_back(persona);
+        else if (digitosNumericos <= 99) grupos["C"].push_back(persona);
     }
 }
 
@@ -142,9 +142,9 @@ std::map<std::string, std::vector<Persona>> Persona::agruparPorDeclaracionValor(
         std::string ultimosDigitos = documento.substr( (documento.size() - 2) );
         int digitosNumericos = std::stoi(ultimosDigitos);
 
-        if (digitosNumericos <= 39) grupos["<39"].push_back(persona);
-        else if (digitosNumericos <= 79) grupos["<79"].push_back(persona);
-        else if (digitosNumericos <= 99) grupos["<99"].push_back(persona);
+        if (digitosNumericos <= 39) grupos["A"].push_back(persona);
+        else if (digitosNumericos <= 79) grupos["B"].push_back(persona);
+        else if (digitosNumericos <= 99) grupos["C"].push_back(persona);
     }
 
     return grupos;
@@ -367,7 +367,7 @@ bool Persona::validarAsignacionCalendario(const Persona& persona, const std::str
     return grupo == grupoEsperado;
 }
 
-//===============================(4) Menor Patrimonio por Ciudad ==================================
+//===============================(4) Menor Patrimonio ==================================
 
 void Persona::personaMinPatrimonio(const std::vector<Persona> &personas, Persona &minPatrimonio){
     if(personas.empty()){
@@ -425,9 +425,9 @@ std::map<std::string, std::vector<Persona>> Persona::declarantePorCiudadValor(co
     for (auto& par : resultado) {
         std::vector<Persona>& grupo = par.second;
         grupo.erase(std::remove_if(grupo.begin(), grupo.end(),
-                                    [](const Persona& p) {
-                                        return !p.getDeclaranteRenta();
-                                    }), grupo.end());
+                    [](const Persona& p) {
+                        return !p.getDeclaranteRenta();
+                    }), grupo.end());
     }
 
     return resultado;
@@ -441,9 +441,9 @@ void Persona::declarantePorCiudad(const std::vector<Persona> &personas,
     for (auto &par : grupos) {
         std::vector<Persona> &grupo = par.second;
         grupo.erase(std::remove_if(grupo.begin(), grupo.end(),
-                                    [](const Persona& p) {
-                                        return !p.getDeclaranteRenta();
-                                    }), grupo.end());
+                    [](const Persona& p) {
+                        return !p.getDeclaranteRenta();
+                    }), grupo.end());
     }
 
 }
