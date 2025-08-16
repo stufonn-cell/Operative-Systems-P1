@@ -45,16 +45,20 @@ inline void Persona::mostrar() const {
 
 inline void Persona::mostrarResumen() const {
     std::cout << "[" << id << "] " << nombre << " " << apellido
-              << " | " << ciudadNacimiento 
+              << " | " << ciudadNacimiento
               << " | $" << std::fixed << std::setprecision(2) << ingresosAnuales;
 }
 
 inline void descomponerFechaYMD(const std::string& fechaISO, int& anio, int& mes, int& dia) {
-    anio = 0; mes = 0; dia = 0;
+    anio = 1970; mes = 12; dia = 28;
+
     if (fechaISO.size() >= 10) {
-        anio = std::stoi(fechaISO.substr(0, 4));
-        mes  = std::stoi(fechaISO.substr(5, 2));
-        dia  = std::stoi(fechaISO.substr(8, 2));
+        if (fechaISO[4] == '-' && fechaISO[7] == '-') {    // "YYYY-MM-DD"
+            if (std::sscanf(fechaISO.c_str(), "%d-%d-%d", &anio, &mes, &dia) == 3) return;
+        } else if (fechaISO[2] == '/' && fechaISO[5] == '/') { // "DD/MM/AAAA"
+            int d=1, m=1, y=1970;
+            if (std::sscanf(fechaISO.c_str(), "%d/%d/%d", &d, &m, &y) == 3) { anio=y; mes=m; dia=d; return; }
+        }
     }
 }
 
