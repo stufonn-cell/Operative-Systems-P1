@@ -236,7 +236,6 @@ std::string Persona::grupoDIANusandoDigitos(int dd){
 
 std::string Persona::grupoDIAN2025(const Persona& persona) {
     int digitos = ultimosDosDigitosCC(persona.getId());
-    std::cout << digitos << std::endl;
     return grupoDIANusandoDigitos(digitos);
 }
 
@@ -446,53 +445,4 @@ void Persona::declarantePorCiudad(const std::vector<Persona> &personas,
                     }), grupo.end());
     }
 
-}
-
-
-int main()
-{
-    std::vector<Persona> personas = generarColeccion(1000000);
-
-    std::map<std::string, std::vector<Persona>> agrupado;
-    auto agrupado2 = Persona::declarantePorCiudadValor(personas);
-    Persona::declarantePorCiudad(personas, agrupado);
-
-    long total = 0;
-    for (auto par: agrupado) {
-        int declarantes = par.second.size();
-        std::cout << "Ciudad: " << par.first << " | Declarantes: " << declarantes << "\n";
-        total += declarantes;
-    }
-
-    std::cout << "Total de declarantes: " << total << "\n";
-
-    std::cout << "=============================\n";
-
-    total = 0;
-    for (auto par: agrupado) {
-        int declarantes = par.second.size();
-        std::cout << "Ciudad: " << par.first << " | Declarantes: " << declarantes << "\n";
-        total += declarantes;
-    }
-
-    std::cout << "Total de declarantes: " << total << "\n";
-
-    // std::map<std::string, Persona> resultado =
-    //     Persona::menorPatrimonioPorCiudad(personas);
-
-    // std::cout << "Menor patrimonio por ciudad:\n\n";
-
-    // for (auto par : resultado) // copia del par (por valor)
-    // {
-    //     std::string ciudad = par.first;
-    //     Persona personaConMenorPatrimonio = par.second; // copia
-
-    //     std::cout << "Ciudad: " << ciudad << "\n";
-    //     std::cout << "  Nombre: " << personaConMenorPatrimonio.getNombre()
-    //               << " " << personaConMenorPatrimonio.getApellido() << "\n";
-    //     std::cout << "  ID: " << personaConMenorPatrimonio.getId() << "\n";
-    //     std::cout << "  Patrimonio: " << personaConMenorPatrimonio.getPatrimonio() << "\n\n";
-    //     }
-
-    return 0;
 }
