@@ -124,21 +124,23 @@ inline void agruparPorCiudad(const std::vector<Persona>& personas,
 // ================================ Agrupar por declaración ==========================================
 inline void agruparPorDeclaracion(
     std::vector<Persona>& personas,
-    std::map<std::string, std::vector<Persona*>>& grupos)
+    std::map<std::string, std::vector<Persona>>& grupos)
 {
     grupos.clear();
     for (auto& p : personas) {
         int dd = extraerUltimosDosDigitos(p.id);
         std::string etiqueta = grupoDIANDesdeDigitos(dd);
         if (etiqueta == "Grupo A" || etiqueta == "Grupo B" || etiqueta == "Grupo C") {
-            grupos[etiqueta].push_back(&p);
+            grupos[etiqueta].push_back(p);
         }
     }
 }
 
-inline void agruparPorDeclaracionValor(
-std::vector<Persona> personas,std::map<std::string, std::vector<Persona>> grupos)
+inline std::map<std::string, std::vector<Persona>> agruparPorDeclaracionValor(
+std::vector<Persona> personas)
 {
+    std::map<std::string, std::vector<Persona>> grupos;
+    
     grupos.clear();
     for (auto p : personas) {
         int dd = extraerUltimosDosDigitos(p.id);
@@ -147,6 +149,8 @@ std::vector<Persona> personas,std::map<std::string, std::vector<Persona>> grupos
             grupos[etiqueta].push_back(p);
         }
     }
+
+    return grupos;
 }
 
 // ***************************** (1) Persona Mas Longeva *************************************

@@ -178,13 +178,60 @@ int main() {
                 memoria_inicio = monitor.obtener_memoria();
 
                 try {
+                    map<string, vector<Persona>> porCiudad;
+
+                    Persona::agruparPorCiudad(*dataset, porCiudad);
+                    cout << "[REF] agruparPorCiudad -> " << porCiudad.size() << " ciudades\n";
+
+
                     Persona masLongeva;
                     Persona::personaMaxLongeva(*dataset, masLongeva);
-                    cout << "\n[REF] Más longeva: "; masLongeva.mostrarResumen(); cout << "\n";
+                    cout << "\n[REF] Más longeva en el país: "; masLongeva.mostrarResumen(); cout << "\n";
 
+                    // Persona más longeva por ciudad
+                    for (const auto& par : porCiudad) {
+                        const string& ciudad = par.first;
+                        const vector<Persona>& personas = par.second;
+                        if (!personas.empty()) {
+                            Persona masLongevaCiudad;
+                            Persona::personaMaxLongeva(personas, masLongevaCiudad);
+                            cout << "[REF] Más longeva en " << ciudad << ": ";
+                            masLongevaCiudad.mostrarResumen();
+                            cout << "\n";
+                        }
+                    }
+                    
                     Persona mayorPatri;
                     Persona::personaMaxPatrimonio(*dataset, mayorPatri);
-                    cout << "[REF] Mayor patrimonio: "; mayorPatri.mostrarResumen(); cout << "\n";
+                    cout << "[REF] Mayor patrimonio en el país: "; mayorPatri.mostrarResumen(); cout << "\n";
+
+                    for (const auto& par : porCiudad) {
+                        const string& ciudad = par.first;
+                        const vector<Persona>& personas = par.second;
+                        if (!personas.empty()) {
+                            Persona mayorPatrimonioCiudad;
+                            Persona::personaMaxPatrimonio(personas, mayorPatrimonioCiudad);
+                            cout << "[REF] Mayor patrimonio en " << ciudad << ": ";
+                            mayorPatrimonioCiudad.mostrarResumen();
+                            cout << "\n";
+                        }
+                    }
+
+                    // Mayor patrimonio por grupo de declaración (A, B, C)
+                    map<string, vector<Persona>> porDeclaracionGrupo;
+                    Persona::agruparPorDeclaracion(*dataset, porDeclaracionGrupo);
+
+                    for (const auto& par : porDeclaracionGrupo) {
+                        const string& grupo = par.first;
+                        const vector<Persona>& personas = par.second;
+                        if (!personas.empty()) {
+                            Persona mayorPatrimonioGrupo;
+                            Persona::personaMaxPatrimonio(personas, mayorPatrimonioGrupo);
+                            cout << "[REF] Mayor patrimonio en grupo " << grupo << ": ";
+                            mayorPatrimonioGrupo.mostrarResumen();
+                            cout << "\n";
+                        }
+                    }
 
                     Persona menorPatri;
                     Persona::personaMinPatrimonio(*dataset, menorPatri);
@@ -195,12 +242,6 @@ int main() {
                     cout << "[REF] Mayor deuda: "; mayorDeuda.mostrarResumen(); cout << "\n";
                 } catch (const std::exception& e) {
                     cout << "Error en búsquedas por referencia: " << e.what() << "\n";
-                }
-
-                {
-                    map<string, vector<Persona>> porCiudad;
-                    Persona::agruparPorCiudad(*dataset, porCiudad);
-                    cout << "[REF] agruparPorCiudad -> " << porCiudad.size() << " ciudades\n";
                 }
 
                 // Declarantes por ciudad (ref)
@@ -262,6 +303,41 @@ int main() {
 
                 auto gCiudad = Persona::agruparPorCiudadValor(*dataset);
                 cout << "[VALOR] agruparPorCiudadValor -> " << gCiudad.size() << " ciudades\n";
+
+                for (const auto& par : gCiudad) {
+                    const string& ciudad = par.first;
+                    const vector<Persona>& personas = par.second;
+                    if (!personas.empty()) {
+                        Persona masLongevaCiudad = Persona::personaMaxLongevaValor(personas);
+                        cout << "[VALOR] Más longeva en " << ciudad << ": ";
+                        masLongevaCiudad.mostrarResumen();
+                        cout << "\n";
+                    }
+                }
+
+                auto grupoDecl = Persona::agruparPorDeclaracionValor(*dataset);
+
+                for (const auto& par : gCiudad) {
+                    const string& ciudad = par.first;
+                    const vector<Persona>& personas = par.second;
+                    if (!personas.empty()) {
+                        Persona mayorPatrimonioCiudad = Persona::personaMaxPatrimonioValor(personas);
+                        cout << "[VALOR] Mayor patrimonio en " << ciudad << ": ";
+                        mayorPatrimonioCiudad.mostrarResumen();
+                        cout << "\n";
+                    }
+                }
+
+                for (const auto& par : grupoDecl) {
+                    const string& grupo = par.first;
+                    const vector<Persona>& personas = par.second;
+                    if (!personas.empty()) {
+                        Persona mayorPatrimonioGrupo = Persona::personaMaxPatrimonioValor(personas);
+                        cout << "[VALOR] Mayor patrimonio en grupo " << grupo << ": ";
+                        mayorPatrimonioGrupo.mostrarResumen();
+                        cout << "\n";
+                    }
+                }
 
                 auto declCiudad = Persona::declarantePorCiudadValor(*dataset);
                 cout << "[VALOR] declarantePorCiudadValor -> " << declCiudad.size()

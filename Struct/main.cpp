@@ -203,9 +203,44 @@ int main() {
                 declarantePorCiudad(*personas, declaranteCiudad);
                 std::cout << "[APUNTADOR] declarantePorCiudadValor -> " << declaranteCiudad.size() << " ciudades con declarantes\n";
 
-                std::map<std::string, std::vector<Persona*>> gruposPtr;
+                std::map<std::string, std::vector<Persona>> gruposPtr;
+
+                for (const auto& [ciudad, personasEnCiudad] : gruposCiudad) {
+                    if (!personasEnCiudad.empty()) {
+                        Persona longevaCiudad;
+                        personaMaxLongeva(personasEnCiudad, longevaCiudad);
+                        std::cout << "[APUNTADOR] Más longeva en " << ciudad << ": ";
+                        longevaCiudad.mostrarResumen();
+                        std::cout << "\n";
+                    }
+                }
+
+                // Mayor patrimonio por ciudad (por apuntador)
+                for (const auto& [ciudad, personasEnCiudad] : gruposCiudad) {
+                    if (!personasEnCiudad.empty()) {
+                        Persona maxPatrimonioCiudad;
+                        personaMaxPatrimonio(personasEnCiudad, maxPatrimonioCiudad);
+                        std::cout << "[APUNTADOR] Mayor patrimonio en " << ciudad << ": ";
+                        maxPatrimonioCiudad.mostrarResumen();
+                        std::cout << "\n";
+                    }
+                }
 
                 agruparPorDeclaracion(*personas, gruposPtr);
+
+                // Mayor patrimonio por declaracion (por apuntador)
+                for (auto par : gruposPtr) {
+                    const auto& grupo = par.first;
+                    const auto personasGrupo = par.second;
+                    if (!personasGrupo.empty()) {
+                        Persona maxPatrimonioGrupo;
+                        personaMaxPatrimonio(personasGrupo, maxPatrimonioGrupo);
+                        std::cout << "[APUNTADOR] Mayor patrimonio en " << grupo << ": ";
+                        maxPatrimonioGrupo.mostrarResumen();
+                        std::cout << "\n";
+                    }
+                }
+                
                 std::cout << "[PTR] agruparPorDeclaracion -> "
                           << "A:" << gruposPtr["Grupo A"].size()
                           << " B:" << gruposPtr["Grupo B"].size()
@@ -217,7 +252,6 @@ int main() {
                 std::cout << "[PTR] calendario -> A:" << contador["Grupo A"]
                 << " B:" << contador["Grupo B"]
                 << " C:" << contador["Grupo C"] << "\n";
-
 
                 double t = monitor.detener_tiempo();
                 long mem = monitor.obtener_memoria() - memoria_inicio;
@@ -256,6 +290,27 @@ int main() {
                 auto gCiudad = agruparPorCiudadValor(*personas);
                 std::cout << "[VALOR] agruparPorCiudadValor -> " << gCiudad.size() << " ciudades\n";
 
+                for (const auto& [ciudad, personasEnCiudad] : gCiudad) {
+                    if (!personasEnCiudad.empty()) {
+                        Persona maxPatrimonioCiudad = personaMaxPatrimonioValor(personasEnCiudad);
+                        std::cout << "[VALOR] Mayor patrimonio en " << ciudad << ": ";
+                        maxPatrimonioCiudad.mostrarResumen();
+                        std::cout << "\n";
+                    }
+                }
+                
+                auto grupoDecl = agruparPorDeclaracionValor(*personas);
+
+                for (const auto& [grupo, personasGrupo] : grupoDecl) {
+                    if (!personasGrupo.empty()) {
+                        Persona maxPatrimonioGrupo = personaMaxPatrimonioValor(personasGrupo);
+                        std::cout << "[VALOR] Mayor patrimonio en " << grupo << ": ";
+                        maxPatrimonioGrupo.mostrarResumen();
+                        std::cout << "\n";
+                    }
+                }
+
+
                 auto declCiudad = declarantePorCiudadValor(*personas);
                 std::cout << "[VALOR] declarantePorCiudadValor -> " << declCiudad.size() << " ciudades con declarantes\n";
 
@@ -265,8 +320,7 @@ int main() {
                           << " B:" << cal.conteo["Grupo B"]
                           << " C:" << cal.conteo["Grupo C"] << "\n";
 
-                std::map<std::string, std::vector<Persona>> dummy;
-                agruparPorDeclaracionValor(*personas, dummy);
+                std::map<std::string, std::vector<Persona>> dummy = agruparPorDeclaracionValor(*personas);
                 std::cout << "[VALOR] agruparPorDeclaracionValor (invocada)\n";
 
                 double t = monitor.detener_tiempo();
